@@ -6,6 +6,7 @@ import axios from "axios";
 import uuid from 'react-native-uuid';
 
 const HomeScreen: FunctionComponent = (props: any) => {
+	const [title, setTitle] = useState<string>("")
 	const [story, setStory] = useState<string>("");
 	const [stories, setStories] = useState<Story[]>([]);
 
@@ -14,7 +15,7 @@ const HomeScreen: FunctionComponent = (props: any) => {
 	}, [stories])
 
 	const getStories = () => {
-		axios.get("https://crud-demo-api-gj2myr203v5s.runkit.sh/")
+		axios.get("http://29f3-180-190-56-112.ngrok.io/")
 		.then(response => {
 			setStories(response.data);
 		})
@@ -22,9 +23,10 @@ const HomeScreen: FunctionComponent = (props: any) => {
 	}
 
 	const handleAddStory = () => {
-		axios.post("https://crud-demo-api-gj2myr203v5s.runkit.sh/posts", {
+		axios.post("http://29f3-180-190-56-112.ngrok.io/posts", {
 			data: {
 				id: uuid.v4(),
+				title,
 				story
 			}
 		})
@@ -40,6 +42,19 @@ const HomeScreen: FunctionComponent = (props: any) => {
             <View style={{ margin: 10 }} />
 			<Text style={styles.heading}>Write what you want..</Text>
 			<View style={{ margin: 10 }} />
+			<Text>Title</Text>
+			<View style={{ margin: 5 }} />
+			<TextInput
+				style={styles.addPostInput}
+				placeholder={"Title"}
+				value={title}
+				onChangeText={setTitle}
+				spellCheck={false}
+				autoCapitalize={"none"}
+			/>
+			<View style={{ margin: 10 }} />
+			<Text>Story</Text>
+			<View style={{ margin: 5 }} />
 			<TextInput
 				style={styles.addPostInput}
 				placeholder={"What's on your mind?"}
@@ -65,6 +80,7 @@ const HomeScreen: FunctionComponent = (props: any) => {
                     <Text>{item.story}</Text>
                     <View style={{ margin: 5 }} />
                 </View>)}
+				showsVerticalScrollIndicator={false}
             />
 		</View>
 	);
