@@ -1,10 +1,40 @@
-import React, { FunctionComponent, useState } from "react";
-import { Button, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import React, { FunctionComponent, useState, useEffect } from "react";
+import { Alert, Button, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import Constants from "expo-constants";
+import { Story } from "../models/Story";
+import axios from "axios";
+import uuid from 'react-native-uuid';
 
 const HomeScreen: FunctionComponent = (props: any) => {
 	const [story, setStory] = useState<string>("");
+	const [stories, setStories] = useState<Story[]>([]);
 
+	useEffect(() => {
+		getStories();
+	}, [stories])
+
+	const getStories = () => {
+		axios.get("https://crud-demo-api-gj2myr203v5s.runkit.sh/")
+		.then(response => {
+			setStories(response.data);
+		})
+		.catch(err => console.error(err));
+	}
+
+	const handleAddStory = () => {
+		axios.post("https://crud-demo-api-gj2myr203v5s.runkit.sh/posts", {
+			data: {
+				id: uuid.v4(),
+				story
+			}
+		})
+		.then(response => {
+			Alert.alert("Add Story", "Add successful");
+			getStories();
+		})
+		.catch(err => console.error(err));
+	}
+	
 	return (
 		<View style={styles.container}>
             <View style={{ margin: 10 }} />
@@ -21,14 +51,10 @@ const HomeScreen: FunctionComponent = (props: any) => {
 				autoCapitalize={"none"}
 			/>
 			<View style={{ margin: 10 }} />
-			<Button title={"Add Story"} onPress={() => {}} />
+			<Button title={"Add Story"} onPress={handleAddStory} />
             <View style={{ margin: 10 }} />
             <FlatList
-                data={[
-                    {id:1, title: "React Native Workshop", "author": "Royce", "story": "Ito ang kwento ko bow."},
-                    {id:2, title: "Jamming", "author": "Unknown", "story": "Bakit kasi di pa tayo mag jamming?"},
-                    {id:3, title: "Semfie Outreach", "author": "Boybawang", "story": "Wag na maglaro habang nag wworkshop 😂"}
-                ]}
+                data={stories}
                 keyExtractor={(item)=>item.id.toString()}
                 ListHeaderComponent={<Text style={styles.heading}>Freedom Wall</Text>}
                 ItemSeparatorComponent={() => <View style={{ margin: 10 }} />}
